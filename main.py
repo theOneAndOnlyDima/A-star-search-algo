@@ -1,16 +1,37 @@
-# This is a sample Python script.
+import pygame
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+# pygame setup
+pygame.init()
+screen = pygame.display.set_mode((1280, 720))
+clock = pygame.time.Clock()
+running = True
 
+start_point = ''
+end_point = ''
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+# create input rectangle
+start_input_rect = pygame.Rect(200, 200, 140, 32)
 
+color = pygame.Color('darkgray')
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+while running:
+    # poll for events
+    # pygame.QUIT event means the user clicked X to close your window
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    # fill the screen with a color to wipe away anything from last frame
+    screen.fill((95, 95, 95))
+
+    pygame.draw.rect(screen, color, start_input_rect)
+
+    # flip() the display to put your work on screen
+    pygame.display.flip()
+
+    # limits FPS to 60
+    # dt is delta time in seconds since last frame, used for framerate-
+    # independent physics.
+    dt = clock.tick(60) / 1000
+
+pygame.quit()
