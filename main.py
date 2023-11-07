@@ -1,3 +1,5 @@
+import sys
+
 import pygame
 
 # pygame setup
@@ -11,6 +13,7 @@ running = True
 # set the window name
 pygame.display.set_caption('A-star algorithm')
 
+
 class Coords:
     start = [0, 0]
     end = [0, 0]
@@ -18,17 +21,61 @@ class Coords:
 
 # display window to ask for start and end coords
 # TODO: finish this abomination
+# TODO: choose better text font and color
 def ask_coords_window() -> Coords:
-    window_width = 350
-    window_height = 200
+    window_width = 500
+    window_height = 230
     input_window = pygame.Rect(width/2-window_width/2, height/2-window_height/2, window_width, window_height)
     pygame.draw.rect(screen, input_window_color, input_window)
 
     font = pygame.font.Font('freesansbold.ttf', 16)
-    label1 = font.render('Start coords (between (0, 0) and (50, 50)):', True, background_color)
+
+    # label1
+    label1 = font.render('Start coordinates (between (0, 0) and (50, 50)):', True, 'white')
     label1_rect = label1.get_rect()
-    label1_rect.center = (width/2, height/2)
+    label1_rect.center = (width/2-60, height/2-60)
     screen.blit(label1, label1_rect)
+
+    # label2
+    label2 = font.render('End coordinates (between (0, 0) and (50, 50)):', True, 'white')
+    label2_rect = label2.get_rect()
+    label2_rect.center = (width/2-63, height/2-10)
+    screen.blit(label2, label2_rect)
+
+    input_width = 100
+    input_height = 40
+
+    # input1
+    input1 = ''
+    input1_is_active = False
+    input1_rect = pygame.Rect(width/2+125, height/2-80, input_width, input_height)
+    pygame.draw.rect(screen, input_box_color, input1_rect)
+
+    # input2
+    input2 = ''
+    input2_is_active = False
+    input2_rect = pygame.Rect(width/2+125, height/2-30, input_width, input_height)
+    pygame.draw.rect(screen, input_box_color, input2_rect)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        if event.type == pygame.MOUSEBUTTONUP:
+            if input1_rect.collidepoint(event.pos):
+                input1_is_active = True
+                input2_is_active = False
+            elif input2_rect.collidepoint(event.pos):
+                input1_is_active = False
+                input2_is_active = True
+            else:
+                input1_is_active = False
+                input2_is_active = False
+
+        if event.type == pygame.KEYDOWN and input1_is_active:
+            if event.key == pygame.K_BACKSPACE:
+                input1 = input1[:-1]
+
     pass
 
 
