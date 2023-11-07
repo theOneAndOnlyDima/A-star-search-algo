@@ -19,11 +19,27 @@ class Coords:
     end = [0, 0]
 
 
+def draw_text(font: pygame.font.Font, text: str, color: str, pos_x: int, pos_y: int):
+    label = font.render(text, True, color)
+    label_rect = label.get_rect()
+    label_rect.center = (pos_x, pos_y)
+    screen.blit(label, label_rect)
+
+
+def draw_input_box(pos_x: int, pos_y: int) -> pygame.Rect:
+    input_width = 50
+    input_height = 40
+    input_rect = pygame.Rect(pos_x, pos_y, input_width, input_height)
+    pygame.draw.rect(screen, input_box_color, input_rect)
+    return input_rect
+
+
 # display window to ask for start and end coords
 # TODO: finish this abomination
-# TODO: choose better text font and color
+# TODO: add text All coords must be between 0 and 50
+# TODO: study the algorithm
 def ask_coords_window() -> Coords:
-    window_width = 500
+    window_width = 400
     window_height = 230
     input_window = pygame.Rect(width/2-window_width/2, height/2-window_height/2, window_width, window_height)
     pygame.draw.rect(screen, input_window_color, input_window)
@@ -31,41 +47,51 @@ def ask_coords_window() -> Coords:
     font = pygame.font.Font('freesansbold.ttf', 16)
 
     # label1
-    label1 = font.render('Start coordinates (between (0, 0) and (50, 50)):', True, 'white')
-    label1_rect = label1.get_rect()
-    label1_rect.center = (width/2-60, height/2-60)
-    screen.blit(label1, label1_rect)
+    draw_text(font, 'Start coordinates:', 'white', width//2-110, height//2-60)
+
+    # x1
+    draw_text(font, 'x:', 'white', width//2, height//2-60)
+
+    # y1
+    draw_text(font, 'y:', 'white', width//2+105, height//2-60)
 
     # label2
-    label2 = font.render('End coordinates (between (0, 0) and (50, 50)):', True, 'white')
-    label2_rect = label2.get_rect()
-    label2_rect.center = (width/2-63, height/2-10)
-    screen.blit(label2, label2_rect)
+    draw_text(font, 'End coordinates:', 'white', width//2-113, height//2-10)
 
-    input_width = 100
+    # x2
+    draw_text(font, 'x:', 'white', width//2, height//2-10)
+
+    # y2
+    draw_text(font, 'y:', 'white', width//2+105, height//2-10)
+
+    input_width = 50
     input_height = 40
 
-    # input1
+    # input x1
     input1 = ''
     input1_is_active = False
-    input1_rect = pygame.Rect(width/2+125, height/2-80, input_width, input_height)
-    pygame.draw.rect(screen, input_box_color, input1_rect)
+    input_x1 = draw_input_box(width//2+20, height//2-80)
 
-    # input2
+    # input y1
+    input_y1 = draw_input_box(width//2+125, height//2-80)
+
+    # input x2
     input2 = ''
     input2_is_active = False
-    input2_rect = pygame.Rect(width/2+125, height/2-30, input_width, input_height)
-    pygame.draw.rect(screen, input_box_color, input2_rect)
+    input_x2 = draw_input_box(width//2+20, height//2-30)
+
+    # input y2
+    input_y2 = draw_input_box(width//2+125, height//2-30)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
         if event.type == pygame.MOUSEBUTTONUP:
-            if input1_rect.collidepoint(event.pos):
+            if input_x1.collidepoint(event.pos):
                 input1_is_active = True
                 input2_is_active = False
-            elif input2_rect.collidepoint(event.pos):
+            elif input_y1.collidepoint(event.pos):
                 input1_is_active = False
                 input2_is_active = True
             else:
