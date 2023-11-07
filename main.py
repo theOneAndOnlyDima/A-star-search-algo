@@ -8,6 +8,8 @@ screen = pygame.display.set_mode((width, height))
 clock = pygame.time.Clock()
 running = True
 
+# set the window name
+pygame.display.set_caption('A-star algorithm')
 
 class Coords:
     start = [0, 0]
@@ -15,10 +17,18 @@ class Coords:
 
 
 # display window to ask for start and end coords
-# TODO: fix the dimensions
+# TODO: finish this abomination
 def ask_coords_window() -> Coords:
-    input_window = pygame.Rect(width/2-150, height/2-100, 350, 200)
+    window_width = 350
+    window_height = 200
+    input_window = pygame.Rect(width/2-window_width/2, height/2-window_height/2, window_width, window_height)
     pygame.draw.rect(screen, input_window_color, input_window)
+
+    font = pygame.font.Font('freesansbold.ttf', 16)
+    label1 = font.render('Start coords (between (0, 0) and (50, 50)):', True, background_color)
+    label1_rect = label1.get_rect()
+    label1_rect.center = (width/2, height/2)
+    screen.blit(label1, label1_rect)
     pass
 
 
@@ -47,12 +57,6 @@ while running:
 
     ask_coords_window()
 
-    # flip() the display to put your work on screen
     pygame.display.flip()
-
-    # limits FPS to 60
-    # dt is delta time in seconds since last frame, used for framerate-
-    # independent physics.
-    dt = clock.tick(60) / 1000
 
 pygame.quit()
