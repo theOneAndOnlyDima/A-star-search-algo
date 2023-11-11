@@ -19,6 +19,10 @@ class Coords:
     end = [0, 0]
 
 
+input_state = [False] * 4
+input_content = [''] * 4
+
+
 def draw_text(font: pygame.font.Font, text: str, color: str, pos_x: int, pos_y: int):
     label = font.render(text, True, color)
     label_rect = label.get_rect()
@@ -34,7 +38,19 @@ def draw_input_box(pos_x: int, pos_y: int) -> pygame.Rect:
     return input_rect
 
 
+def set_text(e: pygame.event.Event, index: int) -> None:
+    text = input_content[index]
+    if e.key == pygame.K_BACKSPACE:
+        text = text[:-1]
+    else:
+        text += e.unicode
+    input_content[index] = text
+
+
 # display window to ask for start and end coords
+# TODO: change input box color when active
+# TODO: restrict input text length
+# TODO: check if input is in the desired range and only numeric
 # TODO: finish this abomination
 # TODO: add text All coords must be between 0 and 50
 # TODO: study the algorithm
@@ -64,20 +80,13 @@ def ask_coords_window() -> Coords:
     # y2
     draw_text(font, 'y:', 'white', width//2+105, height//2-10)
 
-    input_width = 50
-    input_height = 40
-
     # input x1
-    input1 = ''
-    input1_is_active = False
     input_x1 = draw_input_box(width//2+20, height//2-80)
 
     # input y1
     input_y1 = draw_input_box(width//2+125, height//2-80)
 
     # input x2
-    input2 = ''
-    input2_is_active = False
     input_x2 = draw_input_box(width//2+20, height//2-30)
 
     # input y2
@@ -87,20 +96,46 @@ def ask_coords_window() -> Coords:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-        if event.type == pygame.MOUSEBUTTONUP:
+        if event.type == pygame.MOUSEBUTTONDOWN:
             if input_x1.collidepoint(event.pos):
-                input1_is_active = True
-                input2_is_active = False
+                input_state[0] = True
+                input_state[1] = False
+                input_state[2] = False
+                input_state[3] = False
             elif input_y1.collidepoint(event.pos):
-                input1_is_active = False
-                input2_is_active = True
+                input_state[0] = False
+                input_state[1] = True
+                input_state[2] = False
+                input_state[3] = False
+            elif input_x2.collidepoint(event.pos):
+                input_state[0] = False
+                input_state[1] = False
+                input_state[2] = True
+                input_state[3] = False
+            elif input_y2.collidepoint(event.pos):
+                input_state[0] = False
+                input_state[1] = False
+                input_state[2] = False
+                input_state[3] = True
             else:
-                input1_is_active = False
-                input2_is_active = False
+                input_state[0] = False
+                input_state[1] = False
+                input_state[2] = False
+                input_state[3] = False
+        if event.type == pygame.KEYDOWN:
+            if input_state[0]:
+                set_text(event, 0)
+            if input_state[1]:
+                set_text(event, 1)
+            if input_state[2]:
+                set_text(event, 2)
+            if input_state[3]:
+                set_text(event, 3)
 
-        if event.type == pygame.KEYDOWN and input1_is_active:
-            if event.key == pygame.K_BACKSPACE:
-                input1 = input1[:-1]
+    draw_text(font, input_content[0], 'black', width // 2 + 45, height // 2 - 60)
+    draw_text(font, input_content[1], 'black', width // 2 + 150, height // 2 - 60)
+    draw_text(font, input_content[2], 'black', width // 2 + 45, height // 2 - 10)
+    draw_text(font, input_content[3], 'black', width // 2 + 150, height // 2 - 10)
 
     pass
 
