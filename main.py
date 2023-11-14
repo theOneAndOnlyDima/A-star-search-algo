@@ -23,6 +23,15 @@ input_state = [False] * 4
 input_content = [''] * 4
 
 
+def set_state(index: int) -> None:
+    for i in range(4):
+        input_state[i] = False
+    if index == -1:
+        return
+    else:
+        input_state[index] = True
+
+
 def draw_text(font: pygame.font.Font, text: str, color: str, pos_x: int, pos_y: int):
     label = font.render(text, True, color)
     label_rect = label.get_rect()
@@ -30,11 +39,11 @@ def draw_text(font: pygame.font.Font, text: str, color: str, pos_x: int, pos_y: 
     screen.blit(label, label_rect)
 
 
-def draw_input_box(pos_x: int, pos_y: int) -> pygame.Rect:
+def draw_input_box(pos_x: int, pos_y: int, color: pygame.Color) -> pygame.Rect:
     input_width = 50
     input_height = 40
     input_rect = pygame.Rect(pos_x, pos_y, input_width, input_height)
-    pygame.draw.rect(screen, input_box_color, input_rect)
+    pygame.draw.rect(screen, color, input_rect)
     return input_rect
 
 
@@ -48,7 +57,6 @@ def set_text(e: pygame.event.Event, index: int) -> None:
 
 
 # display window to ask for start and end coords
-# TODO: change input box color when active
 # TODO: restrict input text length
 # TODO: check if input is in the desired range and only numeric
 # TODO: finish this abomination
@@ -81,16 +89,20 @@ def ask_coords_window() -> Coords:
     draw_text(font, 'y:', 'white', width//2+105, height//2-10)
 
     # input x1
-    input_x1 = draw_input_box(width//2+20, height//2-80)
+    input_x1 = draw_input_box(width//2+20, height//2-80,
+                              input_box_selected_color if input_state[0] else input_box_color)
 
     # input y1
-    input_y1 = draw_input_box(width//2+125, height//2-80)
+    input_y1 = draw_input_box(width//2+125, height//2-80,
+                              input_box_selected_color if input_state[1] else input_box_color)
 
     # input x2
-    input_x2 = draw_input_box(width//2+20, height//2-30)
+    input_x2 = draw_input_box(width//2+20, height//2-30,
+                              input_box_selected_color if input_state[2] else input_box_color)
 
     # input y2
-    input_y2 = draw_input_box(width//2+125, height//2-30)
+    input_y2 = draw_input_box(width//2+125, height//2-30,
+                              input_box_selected_color if input_state[3] else input_box_color)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -98,30 +110,15 @@ def ask_coords_window() -> Coords:
             sys.exit()
         if event.type == pygame.MOUSEBUTTONDOWN:
             if input_x1.collidepoint(event.pos):
-                input_state[0] = True
-                input_state[1] = False
-                input_state[2] = False
-                input_state[3] = False
+                set_state(0)
             elif input_y1.collidepoint(event.pos):
-                input_state[0] = False
-                input_state[1] = True
-                input_state[2] = False
-                input_state[3] = False
+                set_state(1)
             elif input_x2.collidepoint(event.pos):
-                input_state[0] = False
-                input_state[1] = False
-                input_state[2] = True
-                input_state[3] = False
+                set_state(2)
             elif input_y2.collidepoint(event.pos):
-                input_state[0] = False
-                input_state[1] = False
-                input_state[2] = False
-                input_state[3] = True
+                set_state(3)
             else:
-                input_state[0] = False
-                input_state[1] = False
-                input_state[2] = False
-                input_state[3] = False
+                set_state(-1)
         if event.type == pygame.KEYDOWN:
             if input_state[0]:
                 set_text(event, 0)
@@ -143,7 +140,8 @@ def ask_coords_window() -> Coords:
 # vars
 background_color = pygame.Color(4, 8, 15)
 button_color = pygame.Color(80, 125, 188)
-input_box_color = pygame.Color(187, 209, 234)
+input_box_color = pygame.Color(146, 181, 222)
+input_box_selected_color = pygame.Color(204, 220, 240)
 input_window_color = pygame.Color(42, 67, 102)
 grid_color = pygame.Color(23, 38, 59)
 start_end_point_color = pygame.Color(69, 40, 230)
