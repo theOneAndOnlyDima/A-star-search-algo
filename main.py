@@ -92,10 +92,10 @@ class Button:
 
 
 # display window to ask for start and end coords
+# TODO: study the algorithm
 # TODO: check if input is in the desired range
 # TODO: finish this abomination
 # TODO: add text All coords must be between 0 and 50
-# TODO: study the algorithm
 def ask_coords_window() -> Coords:
     window_width = 400
     window_height = 230
