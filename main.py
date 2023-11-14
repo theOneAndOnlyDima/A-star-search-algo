@@ -51,13 +51,12 @@ def set_text(e: pygame.event.Event, index: int) -> None:
     text = input_content[index]
     if e.key == pygame.K_BACKSPACE:
         text = text[:-1]
-    else:
+    elif len(text) < 3:
         text += e.unicode
     input_content[index] = text
 
 
 # display window to ask for start and end coords
-# TODO: restrict input text length
 # TODO: check if input is in the desired range and only numeric
 # TODO: finish this abomination
 # TODO: add text All coords must be between 0 and 50
