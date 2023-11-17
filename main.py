@@ -78,10 +78,10 @@ def on_submit():
 window = Tk()
 window.title("Coordinates")
 
-w = window.winfo_screenwidth()
-h = window.winfo_screenheight()
+window_width = window.winfo_screenwidth()
+window_height = window.winfo_screenheight()
 
-window.geometry(f"270x80+{w//2-135}+{h//2-40}")
+window.geometry(f"270x80+{window_width//2-135}+{window_height//2-40}")
 label_start = Label(window, text="Start coordinates (x,y):")
 label_end = Label(window, text="End coordinates (x,y):")
 
@@ -108,15 +108,14 @@ end.show(start_end_point_color)
 
 
 # display window to ask for start and end coords
-# TODO: why start and end are not displayed?
 # TODO: study the algorithm
-# TODO: check if input is in the desired range
+# TODO: check if input is in the desired range (1,48)
 
 def verify_coords() -> bool:
     pass
 
 def main():
-    start.show(wall_color, 1)
+    start.show(start_end_point_color)
     end.show(start_end_point_color)
 
 while True:
