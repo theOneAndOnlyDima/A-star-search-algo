@@ -1,14 +1,13 @@
 import sys
-
 import pygame
+import tkinter as tk
+from tkinter import *
 
 # pygame setup
-pygame.init()
-width = 1280
-height = 720
+width = 900
+height = 900
 screen = pygame.display.set_mode((width, height))
-clock = pygame.time.Clock()
-running = True
+pygame.display.set_caption('A-star algorithm')
 
 # vars
 background_color = pygame.Color(4, 8, 15)
@@ -24,182 +23,108 @@ all_paths_color = pygame.Color(24, 190, 182)
 shortest_path_color = pygame.Color(13, 179, 17)
 # https://coolors.co/04080f-17263b-213551-2a4366-507dbc-a1c6ea-bbd1ea
 
-# set the window name
-pygame.display.set_caption('A-star algorithm')
+class Cell:
+    def __init__(self, x, y) -> None:
+        self.i = x
+        self.j = y
+        self.f = 0
+        self.g = 0
+        self.h = 0
+        self.neighbors = []
+        self.previous = None
+        self.wall = False
+    
+    def show(self, color, stroke=0):
+        x = self.i * w
+        y = self.j * h
+        pygame.draw.rect(screen, color, (x, y, w, h), stroke)
+        pygame.display.update()
 
 
-class Coords:
-    start = [0, 0]
-    end = [0, 0]
+cols = 50
+rows = 50
+grid = [[Cell(i, j) for j in range(cols)] for i in range(rows)]
+w = width // cols
+h = height // rows
 
 
-input_state = [False] * 4
-input_content = [''] * 4
+# show grid
+for i in range(rows):
+    for j in range(cols):
+        grid[i][j].show(grid_color, 1)
+
+# draw border
+for i in range(0, rows):
+    grid[0][i].show(input_window_color)
+    grid[0][i].wall = True
+    grid[rows-1][i].show(input_window_color)
+    grid[rows-1][i].wall = True
+    grid[i][0].show(input_window_color)
+    grid[i][0].wall = True
+    grid[i][cols-1].show(input_window_color)
 
 
-def set_state(index: int) -> None:
-    for i in range(4):
-        input_state[i] = False
-    if index == -1:
-        return
-    else:
-        input_state[index] = True
+def on_submit():
+    global start
+    global end
+    s = entry_start.get().split(",")
+    e = entry_end.get().split(",")
+    start = grid[int(s[0])][int(s[1])]
+    end = grid[int(e[0])][int(e[1])]
+    window.quit()
+    window.destroy()
 
 
-def draw_text(font: pygame.font.Font, text: str, color: str, pos_x: int, pos_y: int):
-    label = font.render(text, True, color)
-    label_rect = label.get_rect()
-    label_rect.center = (pos_x, pos_y)
-    screen.blit(label, label_rect)
+window = Tk()
+window.title("Coordinates")
 
+w = window.winfo_screenwidth()
+h = window.winfo_screenheight()
 
-def draw_input_box(pos_x: int, pos_y: int, color: pygame.Color) -> pygame.Rect:
-    input_width = 50
-    input_height = 40
-    input_rect = pygame.Rect(pos_x, pos_y, input_width, input_height)
-    pygame.draw.rect(screen, color, input_rect)
-    return input_rect
+window.geometry(f"270x80+{w//2-135}+{h//2-40}")
+label_start = Label(window, text="Start coordinates (x,y):")
+label_end = Label(window, text="End coordinates (x,y):")
 
+label_start.grid(row=0, column=0)
+label_end.grid(row=1, column=0)
 
-def draw_btn_box(pos_x: int, pos_y: int, width: int, height: int, color: pygame.Color) -> pygame.Rect:
-    input_rect = pygame.Rect(pos_x, pos_y, width, height)
-    pygame.draw.rect(screen, color, input_rect)
-    return input_rect
+entry_start = Entry(window)
+entry_end = Entry(window)
 
+entry_start.grid(row=0, column=1)
+entry_end.grid(row=1, column=1)
 
-def set_text(e: pygame.event.Event, index: int) -> None:
-    text = input_content[index]
-    if e.key == pygame.K_BACKSPACE:
-        text = text[:-1]
-    elif len(text) < 3 and e.unicode.isnumeric():
-        text += e.unicode
-    input_content[index] = text
+submit = Button(window, text="Submit", command=on_submit)
 
+submit.grid(row=2, columnspan=2)
 
-class Button:
-    def __init__(self, pos_x, pos_y, btn_width, btn_height):
-        self.pos_x = pos_x
-        self.pos_y = pos_y
-        self.width = btn_width
-        self.height = btn_height
-        self.button_box = draw_btn_box(self.pos_x, self.pos_y, self.width, self.height, button_color)
+window.update()
+mainloop()
 
-    def hovered(self):
-        self.button_box = draw_btn_box(self.pos_x, self.pos_y, self.width, self.height, hovered_button_color)
+pygame.init()
 
-    def not_hovered(self):
-        self.button_box = draw_btn_box(self.pos_x, self.pos_y, self.width, self.height, button_color)
+start.show(start_end_point_color)
+end.show(start_end_point_color)
 
 
 # display window to ask for start and end coords
+# TODO: why start and end are not displayed?
 # TODO: study the algorithm
 # TODO: check if input is in the desired range
-# TODO: finish this abomination
-# TODO: add text All coords must be between 0 and 50
-def ask_coords_window() -> Coords:
-    window_width = 400
-    window_height = 230
-    input_window = pygame.Rect(width/2-window_width/2, height/2-window_height/2, window_width, window_height)
-    pygame.draw.rect(screen, input_window_color, input_window)
 
-    font = pygame.font.Font('freesansbold.ttf', 16)
-
-    # label1
-    draw_text(font, 'Start coordinates:', 'white', width//2-110, height//2-60)
-
-    # x1
-    draw_text(font, 'x:', 'white', width//2, height//2-60)
-
-    # y1
-    draw_text(font, 'y:', 'white', width//2+105, height//2-60)
-
-    # label2
-    draw_text(font, 'End coordinates:', 'white', width//2-113, height//2-10)
-
-    # x2
-    draw_text(font, 'x:', 'white', width//2, height//2-10)
-
-    # y2
-    draw_text(font, 'y:', 'white', width//2+105, height//2-10)
-
-    # input x1
-    input_x1 = draw_input_box(width // 2 + 20, height // 2 - 80,
-                              input_box_selected_color if input_state[0] else input_box_color)
-
-    # input y1
-    input_y1 = draw_input_box(width // 2 + 125, height // 2 - 80,
-                              input_box_selected_color if input_state[1] else input_box_color)
-
-    # input x2
-    input_x2 = draw_input_box(width // 2 + 20, height // 2 - 30,
-                              input_box_selected_color if input_state[2] else input_box_color)
-
-    # input y2
-    input_y2 = draw_input_box(width // 2 + 125, height // 2 - 30,
-                              input_box_selected_color if input_state[3] else input_box_color)
-
-    randomize_btn = Button(width // 2 - 170, height // 2 + 40, 120, 50)
-    submit_btn = Button(width // 2 + 50, height // 2 + 40, 120, 50)
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if input_x1.collidepoint(event.pos):
-                set_state(0)
-            elif input_y1.collidepoint(event.pos):
-                set_state(1)
-            elif input_x2.collidepoint(event.pos):
-                set_state(2)
-            elif input_y2.collidepoint(event.pos):
-                set_state(3)
-            else:
-                set_state(-1)
-
-        if event.type == pygame.KEYDOWN:
-            if input_state[0]:
-                set_text(event, 0)
-            if input_state[1]:
-                set_text(event, 1)
-            if input_state[2]:
-                set_text(event, 2)
-            if input_state[3]:
-                set_text(event, 3)
-
-    if randomize_btn.button_box.collidepoint(pygame.mouse.get_pos()):
-        randomize_btn.hovered()
-    else:
-        randomize_btn.not_hovered()
-
-    if submit_btn.button_box.collidepoint(pygame.mouse.get_pos()):
-        submit_btn.hovered()
-    else:
-        submit_btn.not_hovered()
-
-    draw_text(font, 'Randomize', 'black', width // 2 - 110, height // 2 + 65)
-    draw_text(font, 'Submit', 'black', width // 2 + 105, height // 2 + 65)
-
-    draw_text(font, input_content[0], 'black', width // 2 + 45, height // 2 - 60)
-    draw_text(font, input_content[1], 'black', width // 2 + 150, height // 2 - 60)
-    draw_text(font, input_content[2], 'black', width // 2 + 45, height // 2 - 10)
-    draw_text(font, input_content[3], 'black', width // 2 + 150, height // 2 - 10)
-
+def verify_coords() -> bool:
     pass
 
+def main():
+    start.show(wall_color, 1)
+    end.show(start_end_point_color)
 
-while running:
+while True:
     # poll for events
     # pygame.QUIT event means the user clicked X to close your window
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            running = False
+            pygame.quit()
 
-    # fill the screen with a color to wipe away anything from last frame
-    screen.fill((95, 95, 95))
-
-    ask_coords_window()
-
-    pygame.display.flip()
-
-pygame.quit()
+    pygame.display.update()
+    main()
