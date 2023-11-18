@@ -10,4 +10,4 @@ Visualisation of the a-star path finding algorithm using python
 3. [x] Create function to verify input
 4. [x] Make background grid
 5. [ ] Create function to randomize coords
-6. [ ] draw walls
+6. [x] draw walls

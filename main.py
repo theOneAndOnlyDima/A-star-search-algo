@@ -2,6 +2,8 @@ import sys
 import pygame
 import tkinter as tk
 from tkinter import *
+from tkinter import messagebox
+import os
 
 # pygame setup
 width = 900
@@ -31,7 +33,7 @@ class Cell:
         self.g = 0
         self.h = 0
         self.neighbors = []
-        self.previous = None
+        self.parent = None
         self.wall = False
     
     def show(self, color, stroke=0):
@@ -40,12 +42,43 @@ class Cell:
         pygame.draw.rect(screen, color, (x, y, w, h), stroke)
         pygame.display.update()
 
+    def add_neighbors(self, grid):
+        i = self.i
+        j = self.j
+        if i < cols-1 and not grid[i+1][j].wall:
+            self.neighbors.append(grid[i+1][j])
+            grid[i+1][j].parent = self
+        if i > 0 and not grid[i-1][j].wall:
+            self.neighbors.append(grid[i-1][j])
+            grid[i-1][j].parent = self
+        if j < rows-1 and not grid[i][j+1].wall:
+            self.neighbors.append(grid[i][j+1])
+            grid[i][j+1].parent = self
+        if j > 0 and not grid[i][j-1].wall:
+            self.neighbors.append(grid[i][j-1])
+            grid[i][j-1].parent = self
+        if i > 0 and j > 0 and not grid[i-1][j-1].wall:
+            self.neighbors.append(grid[i-1][j-1])
+            grid[i-1][j-1].parent = self
+        if i < cols-1 and j > 0 and not grid[i+1][j-1].wall:
+            self.neighbors.append(grid[i+1][j-1])
+            grid[i+1][j-1].parent = self
+        if i > 0 and j < rows-1 and not grid[i-1][j+1].wall:
+            self.neighbors.append(grid[i-1][j+1])
+            grid[i-1][j+1].parent = self
+        if i < cols-1 and j < rows-1 and not grid[i+1][j+1].wall:
+            self.neighbors.append(grid[i+1][j+1])
+            grid[i+1][j+1].parent = self
+
+
 
 cols = 50
 rows = 50
 grid = [[Cell(i, j) for j in range(cols)] for i in range(rows)]
 w = width // cols
 h = height // rows
+open_list = []
+closed_list = []
 
 
 # show grid
@@ -62,6 +95,7 @@ for i in range(0, rows):
     grid[i][0].show(input_window_color)
     grid[i][0].wall = True
     grid[i][cols-1].show(input_window_color)
+    grid[i][cols-1].wall = True
 
 
 def verify_coords(start, end) -> bool:
@@ -114,7 +148,10 @@ entry_end = Entry(window)
 entry_start.grid(row=0, column=1)
 entry_end.grid(row=1, column=1)
 
-submit = Button(window, text="Submit", command=on_submit)
+#submit = Button(window, text="Submit", command=on_submit)
+####
+submit = Button(window, text="Submit", command=window.destroy)
+####
 
 submit.grid(row=2, columnspan=2)
 
@@ -122,9 +159,13 @@ window.update()
 mainloop()
 
 pygame.init()
-
+####
+start = grid[7][8]
+end = grid[35][35]
+####
 start.show(start_end_point_color)
 end.show(start_end_point_color)
+open_list.append(start)
 
 valid = True
 while valid:
@@ -153,12 +194,34 @@ while valid:
                 valid = False
 
 def main():
-    start.show(start_end_point_color)
-    end.show(start_end_point_color)
+    while len(open_list) > 0:
+        lowest_index = 0
+        for i in range(len(open_list)):
+            if open_list[i].f < open_list[lowest_index].f:
+                lowest_index = i
+        current = open_list[lowest_index]
+        open_list.pop(lowest_index)
+
+        current.add_neighbors(grid)
+        for neighbor in current.neighbors:
+            if neighbor == end:
+                result = messagebox.askokcancel('Program Finished', ("Path found! \n Would you like to try again?"))
+                if result:
+                    os.execl(sys.executable, sys.executable, *sys.argv)
+                else:
+                    endgame = True
+                    while endgame:
+                        for event in pygame.event.get():
+                            if event.type == pygame.QUIT():
+                                pygame.quit()
+                                endgame = False
+            # d) ii)
+
+
+
+    pass
 
 while True:
-    # poll for events
-    # pygame.QUIT event means the user clicked X to close your window
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
