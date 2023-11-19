@@ -35,6 +35,7 @@ class Cell:
         self.neighbors = []
         self.parent = None
         self.wall = False
+        self.border = False
     
     def show(self, color, stroke=0):
         x = self.i * w
@@ -89,13 +90,13 @@ for i in range(rows):
 # draw border
 for i in range(0, rows):
     grid[0][i].show(input_window_color)
-    grid[0][i].wall = True
+    grid[0][i].border = True
     grid[rows-1][i].show(input_window_color)
-    grid[rows-1][i].wall = True
+    grid[rows-1][i].border = True
     grid[i][0].show(input_window_color)
-    grid[i][0].wall = True
+    grid[i][0].border = True
     grid[i][cols-1].show(input_window_color)
-    grid[i][cols-1].wall = True
+    grid[i][cols-1].border = True
 
 
 def verify_coords(start, end) -> bool:
@@ -161,7 +162,7 @@ mainloop()
 pygame.init()
 ####
 start = grid[7][8]
-end = grid[35][35]
+end = grid[7][9]
 ####
 start.show(start_end_point_color)
 end.show(start_end_point_color)
@@ -174,20 +175,40 @@ while valid:
             pygame.quit()
             valid = False
         if event.type == pygame.MOUSEBUTTONDOWN:
+            # left click draws walls
             if pygame.mouse.get_pressed()[0]:
                 pos = pygame.mouse.get_pos()
                 x = pos[0] // w
                 y = pos[1] // h
-                if grid[x][y] != start and grid[x][y] != end and not grid[x][y].wall:
+                if grid[x][y] != start and grid[x][y] != end and not grid[x][y].wall and not grid[x][y].border:
                     grid[x][y].wall = True
                     grid[x][y].show(wall_color)
+            # right click deletes walls
+            if pygame.mouse.get_pressed()[2]:
+                pos = pygame.mouse.get_pos()
+                x = pos[0] // w
+                y = pos[1] // h
+                if grid[x][y] != start and grid[x][y] != end and grid[x][y].wall and not grid[x][y].border:
+                    grid[x][y].wall = False
+                    grid[x][y].show(background_color)
+                    grid[x][y].show(grid_color, 1)
+        # left hold draws walls
         if event.type == pygame.MOUSEMOTION and pygame.mouse.get_pressed()[0]:
             pos = pygame.mouse.get_pos()
             x = pos[0] // w
             y = pos[1] // h
-            if grid[x][y] != start and grid[x][y] != end and not grid[x][y].wall:
+            if grid[x][y] != start and grid[x][y] != end and not grid[x][y].wall and not grid[x][y].border:
                 grid[x][y].wall = True
                 grid[x][y].show(wall_color)
+        # right hold deletes walls
+        if event.type == pygame.MOUSEMOTION and pygame.mouse.get_pressed()[2]:
+            pos = pygame.mouse.get_pos()
+            x = pos[0] // w
+            y = pos[1] // h
+            if grid[x][y] != start and grid[x][y] != end and grid[x][y].wall and not grid[x][y].border:
+                grid[x][y].wall = False
+                grid[x][y].show(background_color)
+                grid[x][y].show(grid_color, 1)
         
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE or event.key == pygame.K_RETURN:
