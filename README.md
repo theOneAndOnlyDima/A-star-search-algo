@@ -1,6 +1,6 @@
 # A\* path finding algorithm
 
-Visualisation of the a-star path finding algorithm using python
+Visualization of the a-star path finding algorithm using python
 
 ## Currently working on:
 
@@ -11,3 +11,6 @@ Visualisation of the a-star path finding algorithm using python
 4. [x] Make background grid
 5. [ ] Create function to randomize coords
 6. [x] draw walls
+7. [ ] program won't restart on windows
+8. [ ] multithreaded programming?
+9. [ ] random tk window open when finished?

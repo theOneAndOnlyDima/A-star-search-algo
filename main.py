@@ -1,9 +1,9 @@
 import sys
 import pygame
-import tkinter as tk
 from tkinter import *
 from tkinter import messagebox
 import os
+import math
 
 # pygame setup
 width = 900
@@ -48,28 +48,20 @@ class Cell:
         j = self.j
         if i < cols-1 and not grid[i+1][j].wall:
             self.neighbors.append(grid[i+1][j])
-            grid[i+1][j].parent = self
         if i > 0 and not grid[i-1][j].wall:
             self.neighbors.append(grid[i-1][j])
-            grid[i-1][j].parent = self
         if j < rows-1 and not grid[i][j+1].wall:
             self.neighbors.append(grid[i][j+1])
-            grid[i][j+1].parent = self
         if j > 0 and not grid[i][j-1].wall:
             self.neighbors.append(grid[i][j-1])
-            grid[i][j-1].parent = self
         if i > 0 and j > 0 and not grid[i-1][j-1].wall:
             self.neighbors.append(grid[i-1][j-1])
-            grid[i-1][j-1].parent = self
         if i < cols-1 and j > 0 and not grid[i+1][j-1].wall:
             self.neighbors.append(grid[i+1][j-1])
-            grid[i+1][j-1].parent = self
         if i > 0 and j < rows-1 and not grid[i-1][j+1].wall:
             self.neighbors.append(grid[i-1][j+1])
-            grid[i-1][j+1].parent = self
         if i < cols-1 and j < rows-1 and not grid[i+1][j+1].wall:
             self.neighbors.append(grid[i+1][j+1])
-            grid[i+1][j+1].parent = self
 
 
 
@@ -149,10 +141,7 @@ entry_end = Entry(window)
 entry_start.grid(row=0, column=1)
 entry_end.grid(row=1, column=1)
 
-#submit = Button(window, text="Submit", command=on_submit)
-####
-submit = Button(window, text="Submit", command=window.destroy)
-####
+submit = Button(window, text="Submit", command=on_submit)
 
 submit.grid(row=2, columnspan=2)
 
@@ -160,14 +149,12 @@ window.update()
 mainloop()
 
 pygame.init()
-####
-start = grid[7][8]
-end = grid[7][9]
-####
+
 start.show(start_end_point_color)
 end.show(start_end_point_color)
 open_list.append(start)
 
+# draw walls
 valid = True
 while valid:
     for event in pygame.event.get():
@@ -214,6 +201,15 @@ while valid:
             if event.key == pygame.K_SPACE or event.key == pygame.K_RETURN:
                 valid = False
 
+
+def show_path(node):
+    while node.parent:
+        node.show(shortest_path_color)
+        node = node.parent
+        pygame.time.delay(15)
+
+
+# a-star algorithm
 def main():
     while len(open_list) > 0:
         lowest_index = 0
@@ -226,6 +222,7 @@ def main():
         current.add_neighbors(grid)
         for neighbor in current.neighbors:
             if neighbor == end:
+                show_path(current)
                 result = messagebox.askokcancel('Program Finished', ("Path found! \n Would you like to try again?"))
                 if result:
                     os.execl(sys.executable, sys.executable, *sys.argv)
@@ -236,11 +233,40 @@ def main():
                             if event.type == pygame.QUIT():
                                 pygame.quit()
                                 endgame = False
-            # d) ii)
 
+            if neighbor.wall or neighbor.border or neighbor in closed_list:
+                continue
 
+            g = current.g + 1
+            h = math.sqrt((neighbor.i - end.i)**2 + (neighbor.j - end.j)**2) # euclidean distance
+            f = g + h
 
-    pass
+            if neighbor in open_list and neighbor.f <= f:
+                continue  
+            
+            else:
+                neighbor.g = g
+                neighbor.h = h
+                neighbor.f = f
+                neighbor.parent = current
+                open_list.append(neighbor)
+                neighbor.show(all_paths_color)
+                pygame.time.delay(13)
+
+        closed_list.append(current)
+
+    result = messagebox.askokcancel('Program Finished', ("There is no path to be found:( \n"
+                                                         "Would you like to try again?"))
+    if result:
+        os.execl(sys.executable, sys.executable, *sys.argv)
+    else:
+        endgame = True
+        while endgame:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT():
+                    pygame.quit()
+                    endgame = False
+
 
 while True:
     for event in pygame.event.get():
