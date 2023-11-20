@@ -72,6 +72,8 @@ w = width // cols
 h = height // rows
 open_list = []
 closed_list = []
+root = Tk()
+root.withdraw()
 
 
 # show grid
@@ -224,6 +226,7 @@ def main():
             if neighbor == end:
                 show_path(current)
                 result = messagebox.askokcancel('Program Finished', ("Path found! \n Would you like to try again?"))
+                root.destroy()
                 if result:
                     os.execl(sys.executable, sys.executable, *sys.argv)
                 else:
@@ -257,6 +260,7 @@ def main():
 
     result = messagebox.askokcancel('Program Finished', ("There is no path to be found:( \n"
                                                          "Would you like to try again?"))
+    root.destroy()
     if result:
         os.execl(sys.executable, sys.executable, *sys.argv)
     else:

@@ -13,4 +13,4 @@ Visualization of the a-star path finding algorithm using python
 6. [x] draw walls
 7. [ ] program won't restart on windows
 8. [ ] multithreaded programming?
-9. [ ] random tk window open when finished?
+9. [x] random tk window open when finished?
