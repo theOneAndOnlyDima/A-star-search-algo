@@ -225,17 +225,14 @@ def main():
         for neighbor in current.neighbors:
             if neighbor == end:
                 show_path(current)
-                result = messagebox.askokcancel('Program Finished', ("Path found! \n Would you like to try again?"))
+                messagebox.showinfo('Program Finished', ("Path found!"))
                 root.destroy()
-                if result:
-                    os.execv(os.path.abspath(__file__), *sys.argv)
-                else:
-                    endgame = True
-                    while endgame:
-                        for event in pygame.event.get():
-                            if event.type == pygame.QUIT():
-                                pygame.quit()
-                                endgame = False
+                endgame = True
+                while endgame:
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT():
+                            endgame = False
+                            pygame.quit()
 
             if neighbor.wall or neighbor.border or neighbor in closed_list:
                 continue
