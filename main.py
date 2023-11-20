@@ -107,8 +107,8 @@ def verify_coords(start, end) -> bool:
 def on_submit():
     global start
     global end
-    s = entry_start.get().split(",")
-    e = entry_end.get().split(",")
+    s = [x.strip() for x in entry_start.get().split(",")]
+    e = [x.strip() for x in entry_end.get().split(",")]
     if verify_coords(s, e) and s != e:
         start = grid[int(s[0])][int(s[1])]
         end = grid[int(e[0])][int(e[1])]
@@ -228,7 +228,7 @@ def main():
                 result = messagebox.askokcancel('Program Finished', ("Path found! \n Would you like to try again?"))
                 root.destroy()
                 if result:
-                    os.execl(sys.executable, sys.executable, *sys.argv)
+                    os.execv(os.path.abspath(__file__), *sys.argv)
                 else:
                     endgame = True
                     while endgame:
