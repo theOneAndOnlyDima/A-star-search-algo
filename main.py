@@ -1,3 +1,4 @@
+import random
 import sys
 import pygame
 from tkinter import *
@@ -104,6 +105,13 @@ def verify_coords(start, end) -> bool:
     return True
 
 
+def on_randomize():
+    entry_start.delete(0, END)
+    entry_end.delete(0, END)
+    entry_start.insert(0, f"{random.randint(1, 48)}, {random.randint(1, 48)}")
+    entry_end.insert(0, f"{random.randint(1, 48)}, {random.randint(1, 48)}")
+
+
 def on_submit():
     global start
     global end
@@ -143,9 +151,11 @@ entry_end = Entry(window)
 entry_start.grid(row=0, column=1)
 entry_end.grid(row=1, column=1)
 
+randomize = Button(window, text="Randomize", command=on_randomize)
 submit = Button(window, text="Submit", command=on_submit)
 
-submit.grid(row=2, columnspan=2)
+randomize.grid(row=2, column=0)
+submit.grid(row=2, column=1)
 
 window.update()
 mainloop()
@@ -254,7 +264,7 @@ def main():
                 neighbor.parent = current
                 open_list.append(neighbor)
                 neighbor.show(all_paths_color)
-                pygame.time.delay(5)
+                pygame.time.delay(10)
 
         closed_list.append(current)
 
