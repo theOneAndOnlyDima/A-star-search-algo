@@ -4,7 +4,6 @@ from tkinter import *
 from tkinter import messagebox
 import os
 import math
-import subprocess
 
 # pygame setup
 width = 900
@@ -207,7 +206,7 @@ while valid:
 
 def show_path(node):
     while node.parent:
-        node.show(shortest_path_color)
+        node.show(button_color)
         node = node.parent
         pygame.time.delay(15)
 
@@ -255,7 +254,7 @@ def main():
                 neighbor.parent = current
                 open_list.append(neighbor)
                 neighbor.show(all_paths_color)
-                pygame.time.delay(13)
+                pygame.time.delay(5)
 
         closed_list.append(current)
 
