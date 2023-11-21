@@ -4,6 +4,7 @@ from tkinter import *
 from tkinter import messagebox
 import os
 import math
+import subprocess
 
 # pygame setup
 width = 900
@@ -225,12 +226,15 @@ def main():
         for neighbor in current.neighbors:
             if neighbor == end:
                 show_path(current)
-                messagebox.showinfo('Program Finished', ("Path found!"))
+                result = messagebox.askokcancel('Program Finished', ("Path found! \nWould you like to try again?"))
                 root.destroy()
+                if result:
+                    os.execl(sys.executable, sys.executable, *sys.argv)
+
                 endgame = True
                 while endgame:
                     for event in pygame.event.get():
-                        if event.type == pygame.QUIT():
+                        if event.type == pygame.QUIT:
                             endgame = False
                             pygame.quit()
 
@@ -260,13 +264,13 @@ def main():
     root.destroy()
     if result:
         os.execl(sys.executable, sys.executable, *sys.argv)
-    else:
-        endgame = True
-        while endgame:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT():
-                    pygame.quit()
-                    endgame = False
+
+    endgame = True
+    while endgame:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                endgame = False
 
 
 while True:
